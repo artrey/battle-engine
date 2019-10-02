@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BattleEngine", "BattleEngine\BattleEngine.csproj", "{AF81545C-76F4-464E-957C-0946231D4C13}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleUI", "ConsoleUI\ConsoleUI.csproj", "{3D693572-0789-4727-B4C1-C5C71CAF881D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AF81545C-76F4-464E-957C-0946231D4C13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF81545C-76F4-464E-957C-0946231D4C13}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF81545C-76F4-464E-957C-0946231D4C13}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF81545C-76F4-464E-957C-0946231D4C13}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D693572-0789-4727-B4C1-C5C71CAF881D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D693572-0789-4727-B4C1-C5C71CAF881D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D693572-0789-4727-B4C1-C5C71CAF881D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D693572-0789-4727-B4C1-C5C71CAF881D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
