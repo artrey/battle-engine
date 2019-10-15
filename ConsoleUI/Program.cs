@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using BattleEngine;
-using BattleEngine.Units;
-using Action = BattleEngine.Action;
+using BattleEngine.MapEntities;
 
 namespace ConsoleUI
 {
@@ -10,62 +10,55 @@ namespace ConsoleUI
     {
         static void Main(string[] args)
         {
-//            var u = new Angel();
-//            var s = new UnitsStack(u, 10);
-//            Console.WriteLine(s.Count);
-//            s.SetCount(100);
-//            Console.WriteLine(s.Count);
-//            s.Add(10);
-//            Console.WriteLine(s.Count);
-//            s.Decrease(80);
-//            Console.WriteLine(s.Count);
-//            Console.WriteLine(s.IsAlive);
-//            s.Decrease(30);
-//            Console.WriteLine(s.Count);
-//            Console.WriteLine(s.IsAlive);
-//
-//            Console.WriteLine(UnitType.Angel.Description());
-//
-//            var a = new Army(new [] {s});
-//            Console.WriteLine(a.Count);
-//            a.RemoveStack(s);
-//            Console.WriteLine(a.Count);
-//            a.AddStack(s);
-//            Console.WriteLine(a.Count);
-//
-//            Console.WriteLine(Perk.ImmuneToFire.Description());
-//
-//            var scale = new InitiativeScale(new[] {new BattleUnitsStack(new Devil(), 10)}, new[] {new BattleUnitsStack(u, 5)});
-//            foreach (var stack in scale)
-//            {
-//                Console.WriteLine(stack);
-//            }
-//            Console.WriteLine(scale.IsFinished);
-//
-//            var scale2 = new InitiativeScale(new[] {new BattleUnitsStack(new Devil(), 10), new BattleUnitsStack(u, 5)}, null);
-//            foreach (var stack in scale2)
-//            {
-//                Console.WriteLine(stack);
-//            }
-//            Console.WriteLine(scale2.IsFinished);
-            var army1 = new BattleArmy(new[]
-                {new BattleUnitsStack(new Angel(), 5), new BattleUnitsStack(new Angel(), 30)});
-            var army2 = new BattleArmy(new[]
-                {new BattleUnitsStack(new Angel(), 4), new BattleUnitsStack(new Devil(), 41)});
-            var battle = new Battle(army1, army2);
-            
-            while (!battle.IsFinished)
+            Localizator.Localizator.Init(new CultureInfo("ru-RU"));
+            var units = Loader.GetUnits().ToDictionary(u => u.Name, u => u);
+            Console.WriteLine("=== UNITS ===");
+            foreach (var unit in units)
             {
-                var s = battle.NextUnitsStack();
-                foreach (var stack in battle.Left.Stacks.Concat(battle.Right.Stacks))
-                {
-                    if (!battle.PreviewAct(s, Action.Attack, stack)) continue;
-                    battle.Act(s, Action.Attack, stack);
-                    break;
-                }
+                Console.WriteLine(unit.Value);
             }
 
-            Console.WriteLine(battle.Winner);
+            var a1 = new Army(new[]
+            {
+                new UnitsStack(units["Angel"], 10),
+                new UnitsStack(units["Devil"], 7),
+                new UnitsStack(units["Goblin"], 159),
+                new UnitsStack(units["Invoker"], 22),
+            });
+            Console.WriteLine("=== MAP ARMY 1 ===");
+            Console.WriteLine(a1);
+
+            var a2 = new Army(new[]
+            {
+                new UnitsStack(units["Chaos Knight"], 40),
+                new UnitsStack(units["Devil"], 11),
+                new UnitsStack(units["Archangel"], 6),
+            });
+            Console.WriteLine("=== MAP ARMY 2 ===");
+            Console.WriteLine(a2);
+
+            var ba1 = new BattleEngine.BattleEntities.Army(a1);
+            Console.WriteLine("=== BATTLE ARMY 1 ===");
+            Console.WriteLine(ba1);
+
+            var ba2 = new BattleEngine.BattleEntities.Army(a2);
+            Console.WriteLine("=== BATTLE ARMY 2 ===");
+            Console.WriteLine(ba2);
+            
+            // here battle
+            ba2.Stacks.First().Hit(ba1.Stacks.First());
+            ba1.Stacks.First().Hit(ba2.Stacks.First());
+
+            if (ba1.Count > 0)
+            {
+                Console.WriteLine("=== MAP ARMY 1 (AFTER BATTLE) ===");
+                Console.WriteLine(ba1.ToMapArmy());
+            }
+            if (ba2.Count > 0)
+            {
+                Console.WriteLine("=== MAP ARMY 2 (AFTER BATTLE) ===");
+                Console.WriteLine(ba2.ToMapArmy());
+            }
         }
     }
 }

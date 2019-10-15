@@ -1,20 +1,18 @@
+using Localizator;
+
 namespace BattleEngine
 {
-  public abstract class Unit : IEntity
+  public abstract class Unit : ParametersEntity
   {
-    public UnitType Type { get; }
-    public uint HitPoints { get; }
-    public uint Attack { get; }
-    public uint Defence { get; }
-    public uint MinDamage { get; }
-    public uint MaxDamage { get; }
-    public double Initiative { get; }
+    public string Name { get; }
+    public string VisualName { get; }
     public uint Points { get; }
 
-    public Unit(UnitType unitType, uint hitPoints, uint attack, uint defence, 
+    public Unit(string name, uint hitPoints, uint attack, uint defence,
       uint minDamage, uint maxDamage, double initiative, uint points)
     {
-      Type = unitType;
+      Name = name;
+      VisualName = name.T();
       HitPoints = hitPoints;
       Attack = attack;
       Defence = defence;
@@ -22,6 +20,12 @@ namespace BattleEngine
       MaxDamage = maxDamage;
       Initiative = initiative;
       Points = points;
+    }
+
+    public override string ToString()
+    {
+      return
+        $"<{VisualName} [HP: {HitPoints} / A: {Attack} / D: {Defence} / Dmg: {MinDamage}-{MaxDamage} / I: {Initiative}]>";
     }
   }
 }

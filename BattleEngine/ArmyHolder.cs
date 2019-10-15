@@ -1,32 +1,42 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace BattleEngine
 {
-  public abstract class ArmyHolder<T> where T : UnitsStack
+  public abstract class ArmyHolder<T> : ICapacity where T : class
   {
     public abstract uint Capacity { get; }
 
     protected readonly List<T> stacks = new List<T>();
 
-    public IEnumerable<T> Stacks => stacks.ToList();
+    public virtual IEnumerable<T> Stacks => stacks.ToArray();
 
-    public uint Count => (uint)stacks.Count();
+    public uint Count => (uint)stacks.Count;
 
-    public ArmyHolder() {}
-
-    public ArmyHolder(IEnumerable<T> stacks)
+    protected ArmyHolder(IEnumerable<T> stacks)
     {
+      if (stacks is null)
+      {
+        throw new ArgumentNullException(nameof(stacks));
+      }
       foreach (var s in stacks)
       {
         AddStack(s);
       }
+
+      if (Count == 0)
+      {
+        throw new ArgumentException(nameof(stacks));
+      }
     }
 
-    public void AddStack(T stack)
+    protected void AddStack(T stack)
     {
+      if (stack is null)
+      {
+        throw new ArgumentNullException(nameof(stack));
+      }
       if (stacks.Count >= Capacity)
       {
         throw new OverflowException($"Max capacity is {Capacity}");
@@ -38,8 +48,12 @@ namespace BattleEngine
       stacks.Add(stack);
     }
 
-    public void RemoveStack(T stack)
+    protected void RemoveStack(T stack)
     {
+      if (stack is null)
+      {
+        throw new ArgumentNullException(nameof(stack));
+      }
       if (!stacks.Contains(stack))
       {
         throw new ArgumentException(nameof(stack));

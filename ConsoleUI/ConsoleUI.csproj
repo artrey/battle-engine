@@ -2,11 +2,12 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>netcoreapp2.2</TargetFramework>
+        <TargetFramework>netcoreapp3.0</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\BattleEngine\BattleEngine.csproj" />
+      <ProjectReference Include="..\DotaMod\DotaMod.csproj" />
     </ItemGroup>
 
 </Project>
