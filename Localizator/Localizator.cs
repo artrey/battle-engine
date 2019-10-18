@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -26,7 +27,14 @@ namespace Localizator
         public static string T(this string str)
         {
             if (_loc == null) return str;
-            return _loc.TryGetKey(str, out var tr) ? tr : str;
+            try
+            {
+                return _loc.TryGetKey(str, out var tr) ? tr : str;
+            }
+            catch (ArgumentException)
+            {
+                return str;
+            }
         }
     }
 }

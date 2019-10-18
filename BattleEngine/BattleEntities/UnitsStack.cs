@@ -1,39 +1,54 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace BattleEngine.BattleEntities
 {
   public class UnitsStack : ParametersEntity, ICapacity
   {
-    public uint Capacity => Constants.STACK_MAX_CAPACITY;
     public Unit Unit { get; }
-    public uint Count => (uint)Math.Floor(1.0 * TotalHitPoints / HitPoints);
-    protected uint StartCount { get; }
+    public uint Capacity => Constants.STACK_MAX_CAPACITY;
+    public uint Count => (uint)Math.Ceiling(1.0 * TotalHitPoints / HitPoints);
+    public uint StartCount { get; }
     public uint TotalHitPoints { get; private set; }
+
+    public uint LastUnitHitPoints => TotalHitPoints > 0 ? TotalHitPoints - (Count - 1) * Unit.HitPoints : 0;
+    
+    private readonly Dictionary<IModifier, uint> _temporaryModifiers = new Dictionary<IModifier, uint>();
+    private readonly HashSet<IModifier> _permanentModifiers = new HashSet<IModifier>();
+
+    public IEnumerable<IModifier> Modifiers 
+      => _temporaryModifiers.Keys.Union(_permanentModifiers).OrderBy(m => m.VisualName());
+
+    public void AddModifier(IModifier modifier, uint rounds)
+    {
+      if (rounds == 0) throw new ArgumentException("Rounds must be grater than 0", nameof(rounds));
+      _temporaryModifiers.Add(modifier, rounds);
+    }
+
+    public void RemoveModifier(IModifier modifier)
+    {
+      _temporaryModifiers.Remove(modifier);
+    }
+
+    public IEnumerable<BattleAction> AvailableActions(Battle battle)
+      => BattleAction.AllActions.Where(a => a.Available(battle, this)).ToArray();
 
     public UnitsStack(MapEntities.UnitsStack stack) : base(stack.Unit)
     {
       Unit = stack.Unit;
       StartCount = stack.Count;
       TotalHitPoints = stack.Count * HitPoints;
-    }
 
-    public MapEntities.UnitsStack ToMapUnitsStack()
-    {
-      return new MapEntities.UnitsStack(Unit, Count);
-    }
-
-    public void Hit(UnitsStack enemy)
-    {
-      var mult = 1 + 0.05 * Math.Abs((int)Attack - enemy.Defence);
-      if (Attack < enemy.Defence)
-      {
-        mult = 1 / mult;
-      }
-
-      var damage = (uint)(Count * mult * new Random().Next((int)MinDamage, (int)MaxDamage + 1));
+      if (Unit.Perks == null) return;
       
-      enemy.Damage(damage);
+      foreach (var perk in Unit.Perks)
+      {
+//        _permanentModifiers.AddRange(perk.);
+      }
     }
+
+    public MapEntities.UnitsStack ToMapUnitsStack() => new MapEntities.UnitsStack(Unit, Count);
 
     public void Damage(uint damage)
     {
@@ -47,9 +62,46 @@ namespace BattleEngine.BattleEntities
       }
     }
 
+    public void Cast(Cast cast, UnitsStack target)
+    {
+      if (!Unit.Casts.Contains(cast)) throw new ArgumentException($"Cast not allowed: {cast}", nameof(cast));
+      cast.Process(target);
+    }
+    
+    public void UpdateAttack(uint value) => Attack = Math.Max(value, 0);
+    public void UpdateDefence(uint value) => Defence = Math.Max(value, 0);
+    public void UpdateInitiative(double value) => Initiative = value;
+
+    public void Refresh(bool endRound)
+    {
+      HitPoints = Unit.HitPoints;
+      Attack = Unit.Attack;
+      Defence = Unit.Defence;
+      MinDamage = Unit.MinDamage;
+      MaxDamage = Unit.MaxDamage;
+      Initiative = Unit.Initiative;
+
+      if (endRound)
+      {
+        foreach (var modifier in _temporaryModifiers.Keys)
+        {
+          --_temporaryModifiers[modifier];
+          if (_temporaryModifiers[modifier] == 0)
+          {
+            _temporaryModifiers.Remove(modifier);
+          }
+        }
+      }
+
+      foreach (var modifier in Modifiers)
+      {
+        modifier.Apply(this);
+      }
+    }
+
     public override string ToString()
     {
-      return $@"<{Unit.VisualName} [{Count}] ({HitPoints + TotalHitPoints - Count * HitPoints})>";
+      return $@"<{Unit.VisualName} [{Count}] ({LastUnitHitPoints})>";
     }
   }
 }

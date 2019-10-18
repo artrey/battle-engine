@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using BattleEngine;
 using BattleEngine.MapEntities;
+using BattleEngine.Modifiers;
+using BattleEngine.Perks;
 
 namespace ConsoleUI
 {
@@ -23,15 +26,15 @@ namespace ConsoleUI
                 new UnitsStack(units["Angel"], 10),
                 new UnitsStack(units["Devil"], 7),
                 new UnitsStack(units["Goblin"], 159),
-                new UnitsStack(units["Invoker"], 22),
+                new UnitsStack(units["Invoker"], 24),
             });
             Console.WriteLine("=== MAP ARMY 1 ===");
             Console.WriteLine(a1);
 
             var a2 = new Army(new[]
             {
-                new UnitsStack(units["Chaos Knight"], 40),
-                new UnitsStack(units["Devil"], 11),
+                new UnitsStack(units["Chaos Knight"], 10),
+                new UnitsStack(units["Devil"], 12),
                 new UnitsStack(units["Archangel"], 6),
             });
             Console.WriteLine("=== MAP ARMY 2 ===");
@@ -44,17 +47,41 @@ namespace ConsoleUI
             var ba2 = new BattleEngine.BattleEntities.Army(a2);
             Console.WriteLine("=== BATTLE ARMY 2 ===");
             Console.WriteLine(ba2);
+
+            var i = 0;
             
             // here battle
-            ba2.Stacks.First().Hit(ba1.Stacks.First());
-            ba1.Stacks.First().Hit(ba2.Stacks.First());
+            var battle = new Battle(ba1, ba2);
+            while (!battle.IsFinished)
+            {
+                Console.WriteLine($"{battle.Round} | {battle.CurrentRound} | {battle.Round + 1} | {battle.NextRound}");
+                var stack = battle.CurrentUnitsStack;
+                var army = battle.CurrentArmy;
 
-            if (ba1.Count > 0)
+                var actions = stack.AvailableActions(battle).ToList();
+                var action = actions.First();
+
+                if (i++ % 3 == 0)
+                    action = actions.Last();
+
+                var enemy = battle.CurrentRound.Stacks.Union(battle.NextRound.Stacks).First(s => battle.GetArmy(s) != army);
+                if (action.Validate(battle, stack, enemy))
+                {
+                    action.Act(battle, stack, enemy);
+                }
+
+                battle.EndTurn(action);
+            }
+            
+            Console.WriteLine("=== WINNER ===");
+            Console.WriteLine(battle.Winner);
+
+            if (ba1.HasUnits)
             {
                 Console.WriteLine("=== MAP ARMY 1 (AFTER BATTLE) ===");
                 Console.WriteLine(ba1.ToMapArmy());
             }
-            if (ba2.Count > 0)
+            if (ba2.HasUnits)
             {
                 Console.WriteLine("=== MAP ARMY 2 (AFTER BATTLE) ===");
                 Console.WriteLine(ba2.ToMapArmy());

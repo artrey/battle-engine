@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using Localizator;
 
 namespace BattleEngine
@@ -7,6 +9,11 @@ namespace BattleEngine
     public string Name { get; }
     public string VisualName { get; }
     public uint Points { get; }
+
+    public IEnumerable<Perk> Perks { get; protected set; }
+    public IEnumerable<Cast> Casts { get; protected set; }
+
+    public bool CanCast => Casts != null && Casts.Any();
 
     public Unit(string name, uint hitPoints, uint attack, uint defence,
       uint minDamage, uint maxDamage, double initiative, uint points)

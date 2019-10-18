@@ -1,48 +1,39 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using BattleEngine.BattleEntities;
 
 namespace BattleEngine
 {
-  public class InitiativeScale : IEnumerable<UnitsStack>
+  public class InitiativeScale
   {
-    public IEnumerable<UnitsStack> NextTurn { get; }
-    public IEnumerable<UnitsStack> CurrentTurn { get; }
-    public UnitsStack Current { get; }
-    public bool IsFinished => Current == null && !CurrentTurn.Any();
+    private Queue<UnitsStack> _stacks;
+    public IEnumerable<UnitsStack> Stacks => _stacks.ToArray();
+    public UnitsStack Current => _stacks.FirstOrDefault();
+    public bool IsFinished => Current == null;
 
-    public InitiativeScale(IEnumerable<UnitsStack> allStacks, IEnumerable<UnitsStack> nextTurnStacks)
+    public InitiativeScale(IEnumerable<UnitsStack> stacks = null)
     {
-      if (allStacks == null)
+      _stacks = stacks == null ? new Queue<UnitsStack>() : Build(stacks);
+    }
+
+    public UnitsStack Dequeue()
+    {
+      if (IsFinished)
       {
-        throw new ArgumentException(nameof(allStacks));
+        throw new InvalidDataException("Scale already is empty");
       }
 
-//      var turnStacks = nextTurnStacks != null ? nextTurnStacks.ToList() : new List<UnitsStack>();
-//      var currentStacks = allStacks.Except(turnStacks).OrderByDescending(s => s.Initiative).ToList();
-//      if (currentStacks.Count != 0)
-//      {
-//        Current = currentStacks.First();
-//        currentStacks.RemoveAt(0);
-//      }
-//      CurrentTurn = currentStacks;
-//      NextTurn = turnStacks.OrderByDescending(s => s.Initiative).ToList();
-    }
-    
-    public IEnumerator<UnitsStack> GetEnumerator()
-    {
-      yield return Current;
-      foreach (var stack in CurrentTurn.Concat(NextTurn))
-      {
-        yield return stack;
-      }
+      return _stacks.Dequeue();
     }
 
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-      return GetEnumerator();
-    }
+    public void Enqueue(UnitsStack stack) => _stacks.Enqueue(stack);
+
+    private static Queue<UnitsStack> Build(IEnumerable<UnitsStack> stacks) 
+      => new Queue<UnitsStack>(stacks.OrderByDescending(s => s.Initiative));
+
+    public void Refresh() => _stacks = Build(_stacks.Where(s => s.Count > 0));
+
+    public override string ToString() => string.Join(" -> ", _stacks);
   }
 }

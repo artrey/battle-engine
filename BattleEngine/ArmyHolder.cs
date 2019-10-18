@@ -4,13 +4,14 @@ using System.Linq;
 
 namespace BattleEngine
 {
-  public abstract class ArmyHolder<T> : ICapacity where T : class
+  public abstract class ArmyHolder<T> : ICapacity where T : ICapacity
   {
     public abstract uint Capacity { get; }
 
     protected readonly List<T> stacks = new List<T>();
 
-    public virtual IEnumerable<T> Stacks => stacks.ToArray();
+    public IEnumerable<T> Stacks => stacks.AsReadOnly();
+    public IEnumerable<T> AliveStacks => stacks.Where(s => s.Count > 0).ToList().AsReadOnly();
 
     public uint Count => (uint)stacks.Count;
 
@@ -33,7 +34,7 @@ namespace BattleEngine
 
     protected void AddStack(T stack)
     {
-      if (stack is null)
+      if (stack == null)
       {
         throw new ArgumentNullException(nameof(stack));
       }
@@ -50,7 +51,7 @@ namespace BattleEngine
 
     protected void RemoveStack(T stack)
     {
-      if (stack is null)
+      if (stack == null)
       {
         throw new ArgumentNullException(nameof(stack));
       }
