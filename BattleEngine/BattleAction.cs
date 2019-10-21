@@ -13,7 +13,7 @@ namespace BattleEngine
 
         public abstract void Act(Battle battle, UnitsStack stack, params UnitsStack[] stacks);
         
-        public virtual void OnEndTurn(Battle battle) => battle.NextRound.Enqueue(battle.CurrentRound.Dequeue());
+//        public virtual void OnEndTurn(Battle battle) => battle.NextRound.Enqueue(battle.CurrentRound.Dequeue());
         
         // TODO: add requirements data - target, targets (area), nothing
     }

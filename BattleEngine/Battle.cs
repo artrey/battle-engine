@@ -12,9 +12,15 @@ namespace BattleEngine
     public Army Right { get; }
     public Army Surrendered { get; private set; }
 
-    public IEnumerable<UnitsStack> Stacks => Left.Stacks.Concat(Right.Stacks).ToList().AsReadOnly();
+    public IEnumerable<UnitsStack> Stacks => Left.Stacks.Concat(Right.Stacks).ToArray();
     
     public uint Round { get; private set; }
+
+    private readonly InitiativeScaleBuilder _initiativeScaleBuilder;
+
+    private InitiativeScale BuildCurrentInitiativeScale() 
+      => _initiativeScaleBuilder.Build(0);
+    
     public InitiativeScale CurrentRound { get; private set; }
     public InitiativeScale NextRound => new InitiativeScale(Stacks);
 
@@ -50,7 +56,8 @@ namespace BattleEngine
       Left = left ?? throw new ArgumentException(nameof(left));
       Right = right ?? throw new ArgumentException(nameof(right));
       Round = 1;
-      CurrentRound = new InitiativeScale(Stacks);
+      _initiativeScaleBuilder = new InitiativeScaleBuilder(this);
+      CurrentRound = BuildCurrentInitiativeScale();
     }
 
     public Army GetArmy(UnitsStack stack)
@@ -76,15 +83,16 @@ namespace BattleEngine
     {
       action.Act(this, stack, stacks);
       
-      CurrentRound.Refresh();
-
+      CurrentRound = BuildCurrentInitiativeScale();
+      
       if (!CurrentRound.IsFinished) return;
-      foreach (var s in NextRound.Stacks)
+      
+      ++Round;
+      foreach (var s in Stacks)
       {
         s.Refresh(true);
       }
-      CurrentRound = NextRound;
-      ++Round;
+      CurrentRound = BuildCurrentInitiativeScale();
     }
   }
 }

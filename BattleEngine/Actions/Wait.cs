@@ -16,6 +16,6 @@ namespace BattleEngine.Actions
         public override void Act(Battle battle, UnitsStack stack, params UnitsStack[] stacks) 
             => stack.AddModifier(new Modifiers.AlreadyWait(), 1);
 
-        public override void OnEndTurn(Battle battle) => battle.CurrentUnitsStack.Refresh(false);
+//        public override void OnEndTurn(Battle battle) => battle.CurrentUnitsStack.Refresh(false);
     }
 }
