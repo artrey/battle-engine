@@ -24,6 +24,9 @@ namespace BattleEngine
 
     public IEnumerable<BattleAction> AvailableActions(UnitsStack stack) 
       => stack.AvailableActions(this);
+    
+    public IEnumerable<BattleAction> CurrentAvailableActions 
+      => AvailableActions(CurrentUnitsStack);
 
     public Army Winner
     {
@@ -64,16 +67,21 @@ namespace BattleEngine
     public void GiveUp(UnitsStack stack) => Surrendered = GetArmy(stack);
     public void GiveUp() => GiveUp(CurrentUnitsStack);
 
-    public void EndTurn(BattleAction action)
+    public bool ActValid(BattleAction action, UnitsStack stack, params UnitsStack[] stacks)
     {
-      action.OnEndTurn(this);
+      return action.Validate(this, stack, stacks);
+    }
+
+    public void Act(BattleAction action, UnitsStack stack, params UnitsStack[] stacks)
+    {
+      action.Act(this, stack, stacks);
       
       CurrentRound.Refresh();
 
       if (!CurrentRound.IsFinished) return;
-      foreach (var stack in NextRound.Stacks)
+      foreach (var s in NextRound.Stacks)
       {
-        stack.Refresh(true);
+        s.Refresh(true);
       }
       CurrentRound = NextRound;
       ++Round;

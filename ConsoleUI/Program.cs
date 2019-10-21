@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using BattleEngine;
 using BattleEngine.MapEntities;
-using BattleEngine.Modifiers;
-using BattleEngine.Perks;
 
 namespace ConsoleUI
 {
@@ -58,19 +55,20 @@ namespace ConsoleUI
                 var stack = battle.CurrentUnitsStack;
                 var army = battle.CurrentArmy;
 
-                var actions = stack.AvailableActions(battle).ToList();
-                var action = actions.First();
+                var actions = battle.CurrentAvailableActions.ToList();
+                var action = i++ % 3 == 0 ? actions.Last() : actions.First();
 
-                if (i++ % 3 == 0)
-                    action = actions.Last();
-
+                // TODO: select the enemy (enemies) if need
                 var enemy = battle.CurrentRound.Stacks.Union(battle.NextRound.Stacks).First(s => battle.GetArmy(s) != army);
-                if (action.Validate(battle, stack, enemy))
-                {
-                    action.Act(battle, stack, enemy);
-                }
 
-                battle.EndTurn(action);
+                if (battle.ActValid(action, stack, enemy))
+                {
+                    battle.Act(action, stack, enemy);
+                }
+                else
+                {
+                    throw new Exception("New action is required");
+                }
             }
             
             Console.WriteLine("=== WINNER ===");
