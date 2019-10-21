@@ -11,6 +11,8 @@ namespace Localizator
 {
     public static class Localizator
     {
+        // TODO: singleton for each lang and factory for languages
+        
         private static readonly DirectoryInfo AssemblyDirectory = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory;
         private static IniData _loc;
         

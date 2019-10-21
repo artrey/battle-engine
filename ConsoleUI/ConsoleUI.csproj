@@ -10,4 +10,8 @@
       <ProjectReference Include="..\DotaMod\DotaMod.csproj" />
     </ItemGroup>
 
+    <Target Name="CopyLangs" AfterTargets="AfterBuild">
+        <Copy SourceFiles="ru-ru.ini" DestinationFolder="$(OutDir)" />
+    </Target>
+
 </Project>
