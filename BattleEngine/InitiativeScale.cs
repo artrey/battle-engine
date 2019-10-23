@@ -1,38 +1,51 @@
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using BattleEngine.BattleEntities;
+using BattleEngine.Modifiers;
 
 namespace BattleEngine
 {
   public class InitiativeScale
   {
-    private Queue<UnitsStack> _stacks;
+    private class UnitsStackComparer : IComparer<UnitsStack>
+    {
+      private uint _roundOffset;
+
+      public UnitsStackComparer(uint roundOffset)
+      {
+        _roundOffset = roundOffset;
+      }
+      
+      int IComparer<UnitsStack>.Compare(UnitsStack x, UnitsStack y)
+      {
+        if (x == null && y == null) return 0;
+        if (x == null) return -1;
+        if (y == null) return 1;
+        
+        // TODO: here check contains with roundOffset 
+        var xIni = x.Initiative * (x.Modifiers.Contains(new AlreadyWait()) ? -1 : 1);
+        var yIni = y.Initiative * (y.Modifiers.Contains(new AlreadyWait()) ? -1 : 1);
+        var result = xIni.CompareTo(yIni);
+        if (result == 0) result = y.Count.CompareTo(x.Count);
+        if (result == 0) result = x.HitPoints.CompareTo(y.HitPoints);
+        if (result == 0) result = x.LastUnitHitPoints.CompareTo(y.LastUnitHitPoints);
+        return result;
+      }
+    }
+    
+    private readonly IEnumerable<UnitsStack> _stacks;
     public IEnumerable<UnitsStack> Stacks => _stacks.ToArray();
     public UnitsStack Current => _stacks.FirstOrDefault();
     public bool IsFinished => Current == null;
 
-    public InitiativeScale(IEnumerable<UnitsStack> stacks = null)
+    public InitiativeScale(IEnumerable<UnitsStack> stacks = null, uint roundOffset = 0)
     {
-      _stacks = stacks == null ? new Queue<UnitsStack>() : Build(stacks);
+      _stacks = stacks == null ? new List<UnitsStack>() : Build(stacks, roundOffset);
     }
 
-    public UnitsStack Dequeue()
-    {
-      if (IsFinished)
-      {
-        throw new InvalidDataException("Scale already is empty");
-      }
-
-      return _stacks.Dequeue();
-    }
-
-    public void Enqueue(UnitsStack stack) => _stacks.Enqueue(stack);
-
-    private static Queue<UnitsStack> Build(IEnumerable<UnitsStack> stacks) 
-      => new Queue<UnitsStack>(stacks.OrderByDescending(s => s.Initiative));
-
-    public void Refresh() => _stacks = Build(_stacks.Where(s => s.Count > 0));
+    private static List<UnitsStack> Build(IEnumerable<UnitsStack> stacks, uint roundOffset) 
+      => new List<UnitsStack>(stacks.Where(s => s.Modifiers.All(m => m.CanAct()))
+        .OrderByDescending(s => s, new UnitsStackComparer(roundOffset)));
 
     public override string ToString() => string.Join(" -> ", _stacks);
   }

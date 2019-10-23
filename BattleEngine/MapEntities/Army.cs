@@ -1,8 +1,10 @@
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace BattleEngine.MapEntities
 {
-  public class Army : ArmyHolder<UnitsStack>
+  [Description("Map army")]
+  public class Army : AbstractArmy<UnitsStack>
   {
     public override uint Capacity => Constants.MAP_ARMY_MAX_CAPACITY;
 

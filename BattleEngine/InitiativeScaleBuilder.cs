@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace BattleEngine
 {
   public class InitiativeScaleBuilder
@@ -9,9 +11,7 @@ namespace BattleEngine
       _battle = battle;
     }
     
-    public InitiativeScale Build(int roundOffset)
-    {
-      return new InitiativeScale(_battle.Stacks);
-    }
+    public InitiativeScale Build(uint roundOffset) 
+      => new InitiativeScale(_battle.Left.AliveStacks.Concat(_battle.Right.AliveStacks), roundOffset);
   }
 }

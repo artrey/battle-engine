@@ -4,18 +4,15 @@ using System.Linq;
 
 namespace BattleEngine
 {
-  public abstract class ArmyHolder<T> : ICapacity where T : ICapacity
+  public abstract class AbstractArmy<T> : ICapacity
   {
+    private readonly List<T> _stacks = new List<T>();
+    public IEnumerable<T> Stacks => _stacks.AsReadOnly();
+    
     public abstract uint Capacity { get; }
+    public uint Count => (uint)_stacks.Count;
 
-    protected readonly List<T> stacks = new List<T>();
-
-    public IEnumerable<T> Stacks => stacks.AsReadOnly();
-    public IEnumerable<T> AliveStacks => stacks.Where(s => s.Count > 0).ToList().AsReadOnly();
-
-    public uint Count => (uint)stacks.Count;
-
-    protected ArmyHolder(IEnumerable<T> stacks)
+    protected AbstractArmy(IEnumerable<T> stacks)
     {
       if (stacks is null)
       {
@@ -38,15 +35,15 @@ namespace BattleEngine
       {
         throw new ArgumentNullException(nameof(stack));
       }
-      if (stacks.Count >= Capacity)
+      if (Count >= Capacity)
       {
         throw new OverflowException($"Max capacity is {Capacity}");
       }
-      if (stacks.Contains(stack))
+      if (_stacks.Contains(stack))
       {
         throw new ArgumentException(nameof(stack));
       }
-      stacks.Add(stack);
+      _stacks.Add(stack);
     }
 
     protected void RemoveStack(T stack)
@@ -55,16 +52,14 @@ namespace BattleEngine
       {
         throw new ArgumentNullException(nameof(stack));
       }
-      if (!stacks.Contains(stack))
+      if (!_stacks.Contains(stack))
       {
         throw new ArgumentException(nameof(stack));
       }
-      stacks.Remove(stack);
+      _stacks.Remove(stack);
     }
 
-    public override string ToString()
-    {
-      return $@"<ArmyHolder [{string.Join(", ", stacks.Select(s => s.ToString()))}]>";
-    }
+    public override string ToString() 
+      => $@"<{this.VisualName()}: [{string.Join(", ", _stacks.Select(s => s.ToString()))}]>";
   }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using BattleEngine.BattleEntities;
+using BattleEngine.Modifiers;
 
 namespace BattleEngine
 {
@@ -11,21 +12,14 @@ namespace BattleEngine
     public Army Left { get; }
     public Army Right { get; }
     public Army Surrendered { get; private set; }
+    public bool IsFinished => !Left.HasUnits || !Right.HasUnits || Surrendered != null;
 
-    public IEnumerable<UnitsStack> Stacks => Left.Stacks.Concat(Right.Stacks).ToArray();
-    
     public uint Round { get; private set; }
 
     private readonly InitiativeScaleBuilder _initiativeScaleBuilder;
-
-    private InitiativeScale BuildCurrentInitiativeScale() 
-      => _initiativeScaleBuilder.Build(0);
-    
     public InitiativeScale CurrentRound { get; private set; }
-    public InitiativeScale NextRound => new InitiativeScale(Stacks);
+    public InitiativeScale NextRound { get; private set; }
 
-    public bool IsFinished => !Left.HasUnits || !Right.HasUnits || Surrendered != null;
-    
     public UnitsStack CurrentUnitsStack => CurrentRound.Current;
 
     public IEnumerable<BattleAction> AvailableActions(UnitsStack stack) 
@@ -33,6 +27,8 @@ namespace BattleEngine
     
     public IEnumerable<BattleAction> CurrentAvailableActions 
       => AvailableActions(CurrentUnitsStack);
+    
+    public IEnumerable<UnitsStack> Stacks => Left.Stacks.Concat(Right.Stacks);
 
     public Army Winner
     {
@@ -57,7 +53,13 @@ namespace BattleEngine
       Right = right ?? throw new ArgumentException(nameof(right));
       Round = 1;
       _initiativeScaleBuilder = new InitiativeScaleBuilder(this);
-      CurrentRound = BuildCurrentInitiativeScale();
+      UpdateInitiativeScales();
+    }
+
+    private void UpdateInitiativeScales()
+    {
+      CurrentRound = _initiativeScaleBuilder.Build(0);
+      NextRound = _initiativeScaleBuilder.Build(1);
     }
 
     public Army GetArmy(UnitsStack stack)
@@ -82,8 +84,8 @@ namespace BattleEngine
     public void Act(BattleAction action, UnitsStack stack, params UnitsStack[] stacks)
     {
       action.Act(this, stack, stacks);
-      
-      CurrentRound = BuildCurrentInitiativeScale();
+      stack.AddModifier(new AlreadyAct(), 1);
+      UpdateInitiativeScales();
       
       if (!CurrentRound.IsFinished) return;
       
@@ -92,7 +94,7 @@ namespace BattleEngine
       {
         s.Refresh(true);
       }
-      CurrentRound = BuildCurrentInitiativeScale();
+      UpdateInitiativeScales();
     }
   }
 }

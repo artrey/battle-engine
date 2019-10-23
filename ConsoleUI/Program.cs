@@ -67,7 +67,8 @@ namespace ConsoleUI
                 var action = ++i % 3 == 0 ? actions.Last() : actions.First();
 
                 // TODO: select the enemy (enemies) if need
-                var enemy = battle.CurrentRound.Stacks.Union(battle.NextRound.Stacks).First(s => battle.GetArmy(s) != army);
+                var enemy = battle.CurrentRound.Stacks.Union(battle.NextRound.Stacks)
+                    .First(s => battle.GetArmy(s) != army);
 
                 if (battle.ActValid(action, stack, enemy))
                 {
@@ -75,7 +76,7 @@ namespace ConsoleUI
                 }
                 else
                 {
-                    throw new Exception("New action is required");
+                    throw new Exception($"Action {action} is not allowed");
                 }
             }
             

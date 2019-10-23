@@ -16,9 +16,6 @@ namespace BattleEngine.MapEntities
       Count = count;
     }
 
-    public override string ToString()
-    {
-      return $@"<{Unit.VisualName()} [{Count}]>";
-    }
+    public override string ToString() => $@"<{Unit.VisualName()} [{Count}]>";
   }
 }

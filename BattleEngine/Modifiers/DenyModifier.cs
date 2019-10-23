@@ -4,6 +4,8 @@ namespace BattleEngine.Modifiers
 {
     public abstract class DenyModifier : AllowModifier
     {
+        public override bool CanAct() => false;
+        
         public override bool CanAttack(UnitsStack enemy) => false;
 
         public override bool CanBeAttacked(UnitsStack enemy) => false;

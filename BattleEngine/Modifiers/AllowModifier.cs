@@ -6,6 +6,8 @@ namespace BattleEngine.Modifiers
 {
     public abstract class AllowModifier : EqualityClass, IModifier
     {
+        public virtual bool CanAct() => true;
+        
         public virtual bool CanAttack(UnitsStack enemy) => true;
 
         public virtual bool CanBeAttacked(UnitsStack enemy) => true;

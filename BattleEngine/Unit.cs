@@ -14,8 +14,8 @@ namespace BattleEngine
 
     public IEnumerable<Perk> Perks { get; protected set; } = new Perk[0];
     public IEnumerable<Cast> Casts { get; protected set; } = new Cast[0];
-    
-    public Unit(uint hitPoints, uint attack, uint defence,
+
+    protected Unit(uint hitPoints, uint attack, uint defence,
       uint minDamage, uint maxDamage, double initiative, uint price)
     {
       HitPoints = hitPoints;
@@ -28,9 +28,7 @@ namespace BattleEngine
     }
 
     public override string ToString()
-    {
-      return
-        $"<{this.VisualName()} [HP: {HitPoints} / A: {Attack} / D: {Defence} / Dmg: {MinDamage}-{MaxDamage} / I: {Initiative}]>";
-    }
+      => $"<{this.VisualName()} [HP: {HitPoints} / A: {Attack} / D: {Defence}"
+         + $" / Dmg: {MinDamage}-{MaxDamage} / I: {Initiative}]>";
   }
 }

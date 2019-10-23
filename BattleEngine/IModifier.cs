@@ -4,6 +4,8 @@ namespace BattleEngine
 {
     public interface IModifier
     {
+        bool CanAct();
+        
         bool CanAttack(UnitsStack enemy);
         bool CanBeAttacked(UnitsStack enemy);
 
