@@ -4,11 +4,11 @@ namespace BattleEngine.MapEntities
 {
   public class UnitsStack : ICapacity
   {
-    public uint Capacity => Constants.STACK_MAX_CAPACITY;
-
     public Unit Unit { get; }
+    
+    public uint Capacity => Constants.STACK_MAX_CAPACITY;
     public uint Count { get; }
-
+    
     public UnitsStack(Unit unit, uint count)
     {
       Unit = unit ?? throw new ArgumentNullException(nameof(unit));
@@ -18,7 +18,7 @@ namespace BattleEngine.MapEntities
 
     public override string ToString()
     {
-      return $@"<{Unit.VisualName} [{Count}]>";
+      return $@"<{Unit.VisualName()} [{Count}]>";
     }
   }
 }

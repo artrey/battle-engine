@@ -1,6 +1,6 @@
 using System.ComponentModel;
 using System.Reflection;
-using Localizator;
+using Localizer;
 
 namespace BattleEngine
 {
@@ -8,9 +8,7 @@ namespace BattleEngine
   {
     public static string Description<T>(this T source)
     {
-        var fi = source.GetType().GetField(source.ToString()) ?? (MemberInfo)source.GetType();
-
-        var attributes = (DescriptionAttribute[])fi.GetCustomAttributes(
+        var attributes = (DescriptionAttribute[])source.GetType().GetCustomAttributes(
             typeof(DescriptionAttribute), false);
 
         return attributes.Length > 0 ? attributes[0].Description : source.ToString();

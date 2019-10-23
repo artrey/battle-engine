@@ -4,15 +4,22 @@ using System.Linq;
 
 namespace BattleEngine.BattleEntities
 {
-  public class UnitsStack : ParametersEntity, ICapacity
+  public class UnitsStack : IParametersEntity, ICapacity
   {
     public Unit Unit { get; }
+    public uint InitialCount { get; }
+    
+    public uint HitPoints { get; private set; }
+    public uint Attack { get; private set; }
+    public uint Defence { get; private set; }
+    public uint MinDamage { get; private set; }
+    public uint MaxDamage { get; private set; }
+    public double Initiative { get; private set; }
+    public uint TotalHitPoints { get; private set; }
+    public uint LastUnitHitPoints => TotalHitPoints > 0 ? TotalHitPoints - (Count - 1) * HitPoints : 0;
+    
     public uint Capacity => Constants.STACK_MAX_CAPACITY;
     public uint Count => (uint)Math.Ceiling(1.0 * TotalHitPoints / HitPoints);
-    public uint StartCount { get; }
-    public uint TotalHitPoints { get; private set; }
-
-    public uint LastUnitHitPoints => TotalHitPoints > 0 ? TotalHitPoints - (Count - 1) * Unit.HitPoints : 0;
     
     private readonly Dictionary<IModifier, uint> _temporaryModifiers = new Dictionary<IModifier, uint>();
     private readonly HashSet<IModifier> _permanentModifiers = new HashSet<IModifier>();
@@ -34,10 +41,13 @@ namespace BattleEngine.BattleEntities
     public IEnumerable<BattleAction> AvailableActions(Battle battle)
       => BattleAction.AllActions.Where(a => a.Available(battle, this)).ToArray();
 
-    public UnitsStack(MapEntities.UnitsStack stack) : base(stack.Unit)
+    public UnitsStack(MapEntities.UnitsStack stack)
     {
       Unit = stack.Unit;
-      StartCount = stack.Count;
+      InitialCount = stack.Count;
+
+      Refresh(false);
+      
       TotalHitPoints = stack.Count * HitPoints;
 
       if (Unit.Perks == null) return;
@@ -101,7 +111,7 @@ namespace BattleEngine.BattleEntities
 
     public override string ToString()
     {
-      return $@"<{Unit.VisualName} [{Count}] ({LastUnitHitPoints})>";
+      return $@"<{Unit.VisualName()} [{Count}] ({LastUnitHitPoints})>";
     }
   }
 }

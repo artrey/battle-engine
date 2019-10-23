@@ -6,7 +6,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleUI", "ConsoleUI\Cons
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotaMod", "DotaMod\DotaMod.csproj", "{56FAEB0B-084D-481B-9582-6D2276AD7BB7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Localizator", "Localizator\Localizator.csproj", "{9900BA0A-4B2F-431A-8736-5DDED1EF8C20}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Localizer", "Localizer\Localizer.csproj", "{9900BA0A-4B2F-431A-8736-5DDED1EF8C20}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
