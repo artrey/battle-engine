@@ -5,7 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Localizator\Localizator.csproj" />
+      <ProjectReference Include="..\Localizer\Localizer.csproj" />
     </ItemGroup>
 
 </Project>

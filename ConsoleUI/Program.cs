@@ -10,12 +10,20 @@ namespace ConsoleUI
     {
         static void Main(string[] args)
         {
-            Localizator.Localizator.Init(new CultureInfo("ru-RU"));
-            var units = Loader.GetUnits().ToDictionary(u => u.Name, u => u);
+            var units = Loader.GetUnits().ToDictionary(u => u.Description(), u => u);
             Console.WriteLine("=== UNITS ===");
             foreach (var unit in units)
             {
                 Console.WriteLine(unit.Value);
+            }
+
+            try
+            {
+                Localizer.Localizer.SetupLocale(new CultureInfo("ru-RU"));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
             }
 
             var a1 = new Army(new[]
@@ -56,7 +64,7 @@ namespace ConsoleUI
                 var army = battle.CurrentArmy;
 
                 var actions = battle.CurrentAvailableActions.ToList();
-                var action = i++ % 3 == 0 ? actions.Last() : actions.First();
+                var action = ++i % 3 == 0 ? actions.Last() : actions.First();
 
                 // TODO: select the enemy (enemies) if need
                 var enemy = battle.CurrentRound.Stacks.Union(battle.NextRound.Stacks).First(s => battle.GetArmy(s) != army);

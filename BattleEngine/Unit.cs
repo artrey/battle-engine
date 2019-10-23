@@ -1,38 +1,36 @@
 using System.Collections.Generic;
-using System.Linq;
-using Localizator;
 
 namespace BattleEngine
 {
-  public abstract class Unit : ParametersEntity
+  public abstract class Unit : EqualityClass, IParametersEntity
   {
-    public string Name { get; }
-    public string VisualName { get; }
-    public uint Points { get; }
+    public uint HitPoints { get; }
+    public uint Attack { get; }
+    public uint Defence { get; }
+    public uint MinDamage { get; }
+    public uint MaxDamage { get; }
+    public double Initiative { get; }
+    public uint Price { get; }
 
-    public IEnumerable<Perk> Perks { get; protected set; }
-    public IEnumerable<Cast> Casts { get; protected set; }
-
-    public bool CanCast => Casts != null && Casts.Any();
-
-    public Unit(string name, uint hitPoints, uint attack, uint defence,
-      uint minDamage, uint maxDamage, double initiative, uint points)
+    public IEnumerable<Perk> Perks { get; protected set; } = new Perk[0];
+    public IEnumerable<Cast> Casts { get; protected set; } = new Cast[0];
+    
+    public Unit(uint hitPoints, uint attack, uint defence,
+      uint minDamage, uint maxDamage, double initiative, uint price)
     {
-      Name = name;
-      VisualName = name.T();
       HitPoints = hitPoints;
       Attack = attack;
       Defence = defence;
       MinDamage = minDamage;
       MaxDamage = maxDamage;
       Initiative = initiative;
-      Points = points;
+      Price = price;
     }
 
     public override string ToString()
     {
       return
-        $"<{VisualName} [HP: {HitPoints} / A: {Attack} / D: {Defence} / Dmg: {MinDamage}-{MaxDamage} / I: {Initiative}]>";
+        $"<{this.VisualName()} [HP: {HitPoints} / A: {Attack} / D: {Defence} / Dmg: {MinDamage}-{MaxDamage} / I: {Initiative}]>";
     }
   }
 }
