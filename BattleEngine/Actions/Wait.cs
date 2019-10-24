@@ -8,7 +8,7 @@ namespace BattleEngine.Actions
     public class Wait : BattleAction
     {
         public override bool Available(Battle battle, UnitsStack stack)
-            => stack.Modifiers.All(m => m.CanWait());
+            => stack.Modifiers().All(m => m.CanWait());
 
         public override bool Validate(Battle battle, UnitsStack stack, params UnitsStack[] stacks)
             => Available(battle, stack);

@@ -23,8 +23,8 @@ namespace BattleEngine.BattleEntities
     
     private readonly Dictionary<IModifier, uint> _temporaryModifiers = new Dictionary<IModifier, uint>();
     private readonly HashSet<IModifier> _permanentModifiers = new HashSet<IModifier>();
-
-    public IEnumerable<IModifier> Modifiers 
+    
+    public IEnumerable<IModifier> Modifiers(uint roundOffset = 0)
       => _temporaryModifiers.Keys.Union(_permanentModifiers).OrderBy(m => m.VisualName());
 
     public void AddModifier(IModifier modifier, uint rounds)
@@ -103,7 +103,7 @@ namespace BattleEngine.BattleEntities
         }
       }
 
-      foreach (var modifier in Modifiers)
+      foreach (var modifier in Modifiers())
       {
         modifier.Apply(this);
       }

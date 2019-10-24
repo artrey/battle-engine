@@ -11,8 +11,8 @@ namespace BattleEngine.Actions
         {
             if (stack.Unit.Casts == null || !stack.Unit.Casts.Any()) return false;
             return stack.Unit.Casts.Any(
-                cast => cast.Mass || battle.Stacks.Any(s => stack.Modifiers.All(m => m.CanCast(cast, s)) && 
-                                                            s.Modifiers.All(m => m.CanBeCasted(cast))));
+                cast => cast.Mass || battle.Stacks.Any(s => stack.Modifiers().All(m => m.CanCast(cast, s)) && 
+                                                            s.Modifiers().All(m => m.CanBeCasted(cast))));
         }
 
         public override bool Validate(Battle battle, UnitsStack stack, params UnitsStack[] stacks)

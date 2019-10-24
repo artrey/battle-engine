@@ -11,11 +11,11 @@ namespace BattleEngine.Actions
     public class Attack : BattleAction
     {
         private static bool CanHit(UnitsStack current, UnitsStack enemy) => 
-            current.Modifiers.All(m => m.CanAttack(enemy)) && 
-            enemy.Modifiers.All(m => m.CanBeAttacked(current));
+            current.Modifiers().All(m => m.CanAttack(enemy)) && 
+            enemy.Modifiers().All(m => m.CanBeAttacked(current));
         
         private static bool CanRetaliate(UnitsStack current, UnitsStack enemy) => 
-            enemy.Modifiers.All(m => m.CanRetaliate(current));
+            enemy.Modifiers().All(m => m.CanRetaliate(current));
 
         private static void Hit(UnitsStack current, UnitsStack enemy)
         {

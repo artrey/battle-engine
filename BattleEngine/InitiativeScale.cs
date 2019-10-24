@@ -23,8 +23,8 @@ namespace BattleEngine
         if (y == null) return 1;
         
         // TODO: here check contains with roundOffset 
-        var xIni = x.Initiative * (x.Modifiers.Contains(new AlreadyWait()) ? -1 : 1);
-        var yIni = y.Initiative * (y.Modifiers.Contains(new AlreadyWait()) ? -1 : 1);
+        var xIni = x.Initiative * (x.Modifiers(_roundOffset).Contains(new AlreadyWait()) ? -1 : 1);
+        var yIni = y.Initiative * (y.Modifiers(_roundOffset).Contains(new AlreadyWait()) ? -1 : 1);
         var result = xIni.CompareTo(yIni);
         if (result == 0) result = y.Count.CompareTo(x.Count);
         if (result == 0) result = x.HitPoints.CompareTo(y.HitPoints);
@@ -43,9 +43,11 @@ namespace BattleEngine
       _stacks = stacks == null ? new List<UnitsStack>() : Build(stacks, roundOffset);
     }
 
-    private static List<UnitsStack> Build(IEnumerable<UnitsStack> stacks, uint roundOffset) 
-      => new List<UnitsStack>(stacks.Where(s => s.Modifiers.All(m => m.CanAct()))
+    private static List<UnitsStack> Build(IEnumerable<UnitsStack> stacks, uint roundOffset)
+    {
+      return new List<UnitsStack>(stacks.Where(s => s.Modifiers(roundOffset).All(m => m.CanAct()))
         .OrderByDescending(s => s, new UnitsStackComparer(roundOffset)));
+    }
 
     public override string ToString() => string.Join(" -> ", _stacks);
   }
