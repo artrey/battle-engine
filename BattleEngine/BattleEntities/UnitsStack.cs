@@ -15,28 +15,55 @@ namespace BattleEngine.BattleEntities
     public uint MinDamage { get; private set; }
     public uint MaxDamage { get; private set; }
     public double Initiative { get; private set; }
-    public uint TotalHitPoints { get; private set; }
-    public uint LastUnitHitPoints => TotalHitPoints > 0 ? TotalHitPoints - (Count - 1) * HitPoints : 0;
+    public uint LastUnitHitPoints { get; private set; }
+    public uint TotalHitPoints
+    {
+     get => (Count - 1) * HitPoints + LastUnitHitPoints;
+     set
+     {
+       var div = Math.DivRem(value, HitPoints, out var mod);
+       if (mod == 0)
+       {
+         Count = (uint)div;
+         LastUnitHitPoints = div > 0 ? HitPoints : 0;
+       }
+       else
+       {
+         Count = (uint)(div + 1);
+         LastUnitHitPoints = (uint)mod;
+       }
+     }
+    }
     
     public uint Capacity => Constants.STACK_MAX_CAPACITY;
-    public uint Count => (uint)Math.Ceiling(1.0 * TotalHitPoints / HitPoints);
-    
-    private readonly Dictionary<IModifier, uint> _temporaryModifiers = new Dictionary<IModifier, uint>();
-    private readonly HashSet<IModifier> _permanentModifiers = new HashSet<IModifier>();
-    
-    public IEnumerable<IModifier> Modifiers(uint roundOffset = 0)
+    public uint Count { get; private set; }
+
+    private readonly HashSet<IModifier> _permanentModifiers;
+    private readonly Dictionary<IModifier, IModifierChecker> _temporaryModifiers;
+
+    public IEnumerable<IModifier> PermanentModifiers
+      => _permanentModifiers.OrderBy(m => m.VisualName());
+    public IEnumerable<KeyValuePair<IModifier, IModifierChecker>> TemporaryModifiers
+      => _temporaryModifiers.OrderBy(p => p.Key.VisualName());
+    public IEnumerable<IModifier> Modifiers
       => _temporaryModifiers.Keys.Union(_permanentModifiers).OrderBy(m => m.VisualName());
 
-    public void AddModifier(IModifier modifier, uint rounds)
+    public void AddPermanentModifier(IModifier modifier)
     {
-      if (rounds == 0) throw new ArgumentException("Rounds must be grater than 0", nameof(rounds));
-      _temporaryModifiers.Add(modifier, rounds);
+      if (modifier == null) throw new ArgumentNullException(nameof(modifier));
+      _permanentModifiers.Add(modifier);
     }
 
-    public void RemoveModifier(IModifier modifier)
+    public void AddTemporaryModifier(IModifier modifier, IModifierChecker checker)
     {
-      _temporaryModifiers.Remove(modifier);
+      if (modifier == null) throw new ArgumentNullException(nameof(modifier));
+      if (checker == null) throw new ArgumentNullException(nameof(checker));
+      if (checker.Expired) throw new ArgumentException("Adding expired modifier is prohibited", nameof(checker));
+      _temporaryModifiers.Add(modifier, checker);
     }
+
+    public void RemovePermanentModifier(IModifier modifier) => _permanentModifiers.Remove(modifier);
+    public void RemoveTemporaryModifier(IModifier modifier) => _temporaryModifiers.Remove(modifier);
 
     public IEnumerable<BattleAction> AvailableActions(Battle battle)
       => BattleAction.AllActions.Where(a => a.Available(battle, this)).ToArray();
@@ -45,17 +72,55 @@ namespace BattleEngine.BattleEntities
     {
       Unit = stack.Unit;
       InitialCount = stack.Count;
-
-      Refresh(false);
+      HitPoints = Unit.HitPoints;
+      TotalHitPoints = stack.Count * Unit.HitPoints;
       
-      TotalHitPoints = stack.Count * HitPoints;
+      _permanentModifiers = new HashSet<IModifier>();
+      _temporaryModifiers = new Dictionary<IModifier, IModifierChecker>();
 
-      if (Unit.Perks == null) return;
-      
-      foreach (var perk in Unit.Perks)
+      if (Unit.Perks.Any())
       {
-//        _permanentModifiers.AddRange(perk.);
+        foreach (var perk in Unit.Perks)
+        {
+//          PermanentModifiers.AddRange(perk.);
+        }
       }
+
+      Refresh();
+    }
+
+    public UnitsStack ForecastClone(uint roundOffset)
+    {
+      var ret = new UnitsStack(ToMapUnitsStack());
+      
+      foreach (var modifier in ret.PermanentModifiers.Except(PermanentModifiers))
+      {
+        ret.RemovePermanentModifier(modifier);
+      }
+      foreach (var modifier in PermanentModifiers.Except(ret.PermanentModifiers))
+      {
+        ret.AddPermanentModifier(modifier);
+      }
+      
+      foreach (var p in _temporaryModifiers)
+      {
+        ret.AddTemporaryModifier(p.Key, p.Value.Clone());
+      }
+
+      while (roundOffset > 0)
+      {
+        foreach (var modifier in ret.TemporaryModifiers)
+        {
+          modifier.Value.Process();
+          if (modifier.Value.Expired)
+            ret.RemoveTemporaryModifier(modifier.Key);
+        }
+        --roundOffset;
+      }
+      
+      ret.Refresh();
+
+      return ret;
     }
 
     public MapEntities.UnitsStack ToMapUnitsStack() => new MapEntities.UnitsStack(Unit, Count);
@@ -82,7 +147,17 @@ namespace BattleEngine.BattleEntities
     public void UpdateDefence(uint value) => Defence = Math.Max(value, 0);
     public void UpdateInitiative(double value) => Initiative = value;
 
-    public void Refresh(bool endRound)
+    public void UpdateModifiers()
+    {
+      foreach (var p in _temporaryModifiers.AsEnumerable())
+      {
+        p.Value.Process();
+        if (p.Value.Expired)
+          _temporaryModifiers.Remove(p.Key);
+      }
+    }
+
+    public void Refresh()
     {
       HitPoints = Unit.HitPoints;
       Attack = Unit.Attack;
@@ -91,19 +166,7 @@ namespace BattleEngine.BattleEntities
       MaxDamage = Unit.MaxDamage;
       Initiative = Unit.Initiative;
 
-      if (endRound)
-      {
-        foreach (var modifier in _temporaryModifiers.Keys)
-        {
-          --_temporaryModifiers[modifier];
-          if (_temporaryModifiers[modifier] == 0)
-          {
-            _temporaryModifiers.Remove(modifier);
-          }
-        }
-      }
-
-      foreach (var modifier in Modifiers())
+      foreach (var modifier in Modifiers)
       {
         modifier.Apply(this);
       }

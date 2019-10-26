@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using BattleEngine.BattleEntities;
 using BattleEngine.Modifiers;
+using BattleEngine.Modifiers.Checkers;
 
 namespace BattleEngine.Actions
 {
@@ -11,11 +12,11 @@ namespace BattleEngine.Actions
     public class Attack : BattleAction
     {
         private static bool CanHit(UnitsStack current, UnitsStack enemy) => 
-            current.Modifiers().All(m => m.CanAttack(enemy)) && 
-            enemy.Modifiers().All(m => m.CanBeAttacked(current));
+            current.Modifiers.All(m => m.CanAttack(enemy)) && 
+            enemy.Modifiers.All(m => m.CanBeAttacked(current));
         
         private static bool CanRetaliate(UnitsStack current, UnitsStack enemy) => 
-            enemy.Modifiers().All(m => m.CanRetaliate(current));
+            enemy.Modifiers.All(m => m.CanRetaliate(current));
 
         private static void Hit(UnitsStack current, UnitsStack enemy)
         {
@@ -55,8 +56,10 @@ namespace BattleEngine.Actions
             foreach (var enemy in stacks.Where(enemy => CanRetaliate(stack, enemy)))
             {
                 Hit(enemy, stack);
-                enemy.AddModifier(new AlreadyRetaliate(), 1);
+                enemy.AddTemporaryModifier(new AlreadyRetaliate(), new TurnModifierChecker(1));
             }
+
+            stack.AddTemporaryModifier(new AlreadyAct(), new TurnModifierChecker(1));
         }
     }
 }

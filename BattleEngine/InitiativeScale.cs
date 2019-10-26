@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using BattleEngine.BattleEntities;
-using BattleEngine.Modifiers;
 
 namespace BattleEngine
 {
@@ -9,23 +8,13 @@ namespace BattleEngine
   {
     private class UnitsStackComparer : IComparer<UnitsStack>
     {
-      private uint _roundOffset;
-
-      public UnitsStackComparer(uint roundOffset)
-      {
-        _roundOffset = roundOffset;
-      }
-      
       int IComparer<UnitsStack>.Compare(UnitsStack x, UnitsStack y)
       {
         if (x == null && y == null) return 0;
         if (x == null) return -1;
         if (y == null) return 1;
         
-        // TODO: here check contains with roundOffset 
-        var xIni = x.Initiative * (x.Modifiers(_roundOffset).Contains(new AlreadyWait()) ? -1 : 1);
-        var yIni = y.Initiative * (y.Modifiers(_roundOffset).Contains(new AlreadyWait()) ? -1 : 1);
-        var result = xIni.CompareTo(yIni);
+        var result = x.Initiative.CompareTo(y.Initiative);
         if (result == 0) result = y.Count.CompareTo(x.Count);
         if (result == 0) result = x.HitPoints.CompareTo(y.HitPoints);
         if (result == 0) result = x.LastUnitHitPoints.CompareTo(y.LastUnitHitPoints);
@@ -45,8 +34,15 @@ namespace BattleEngine
 
     private static List<UnitsStack> Build(IEnumerable<UnitsStack> stacks, uint roundOffset)
     {
-      return new List<UnitsStack>(stacks.Where(s => s.Modifiers(roundOffset).All(m => m.CanAct()))
-        .OrderByDescending(s => s, new UnitsStackComparer(roundOffset)));
+      if (roundOffset == 0)
+      {
+        return stacks.Where(s => s.Modifiers.All(m => m.CanAct()))
+          .OrderByDescending(s => s, new UnitsStackComparer()).ToList();
+      }
+
+      return stacks.ToDictionary(s => s, s => s.ForecastClone(roundOffset))
+        .OrderByDescending(s => s.Value, new UnitsStackComparer())
+        .Select(p => p.Key).ToList();
     }
 
     public override string ToString() => string.Join(" -> ", _stacks);

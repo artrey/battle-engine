@@ -72,6 +72,7 @@ namespace ConsoleUI
 
                 if (battle.ActValid(action, stack, enemy))
                 {
+                    Console.WriteLine($"{stack} | {action.VisualName()} | {enemy}");
                     battle.Act(action, stack, enemy);
                 }
                 else

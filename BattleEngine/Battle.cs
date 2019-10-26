@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using BattleEngine.BattleEntities;
-using BattleEngine.Modifiers;
 
 namespace BattleEngine
 {
@@ -84,7 +83,11 @@ namespace BattleEngine
     public void Act(BattleAction action, UnitsStack stack, params UnitsStack[] stacks)
     {
       action.Act(this, stack, stacks);
-      stack.AddModifier(new AlreadyAct(), 1);
+      stack.Refresh();
+      foreach (var s in stacks)
+      {
+        s.Refresh();
+      }
       UpdateInitiativeScales();
       
       if (!CurrentRound.IsFinished) return;
@@ -92,7 +95,8 @@ namespace BattleEngine
       ++Round;
       foreach (var s in Stacks)
       {
-        s.Refresh(true);
+        s.UpdateModifiers();
+        s.Refresh();
       }
       UpdateInitiativeScales();
     }

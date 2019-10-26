@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using BattleEngine.BattleEntities;
+using BattleEngine.Modifiers.Checkers;
 
 namespace BattleEngine.Actions
 {
@@ -11,6 +12,6 @@ namespace BattleEngine.Actions
         public override bool Validate(Battle battle, UnitsStack stack, params UnitsStack[] stacks) => true;
 
         public override void Act(Battle battle, UnitsStack stack, params UnitsStack[] stacks) => 
-            stack.AddModifier(new Modifiers.Defence(), 1);
+            stack.AddTemporaryModifier(new Modifiers.Defence(), new TurnModifierChecker(1));
     }
 }
