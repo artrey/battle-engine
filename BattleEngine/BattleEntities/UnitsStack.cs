@@ -64,6 +64,8 @@ namespace BattleEngine.BattleEntities
 
     public void RemovePermanentModifier(IModifier modifier) => _permanentModifiers.Remove(modifier);
     public void RemoveTemporaryModifier(IModifier modifier) => _temporaryModifiers.Remove(modifier);
+    
+    public Dictionary<string, bool> Properties = new Dictionary<string, bool>();
 
     public IEnumerable<BattleAction> AvailableActions(Battle battle)
       => BattleAction.AllActions.Where(a => a.Available(battle, this)).ToArray();
@@ -82,7 +84,7 @@ namespace BattleEngine.BattleEntities
       {
         foreach (var perk in Unit.Perks)
         {
-//          PermanentModifiers.AddRange(perk.);
+          perk.Process(this);
         }
       }
 

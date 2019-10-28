@@ -15,9 +15,7 @@ namespace BattleEngine.Modifiers
         }
         
         public override bool CanWait() => false;
-
         public override bool CanCast(Cast cast, UnitsStack target) => false;
-
         public override void Apply(UnitsStack self) 
             => self.UpdateAttack((uint) Math.Round(self.Attack * AttackMultiplier));
     }

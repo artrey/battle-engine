@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using BattleEngine;
+using BattleEngine.Perks;
 
 namespace DotaMod
 {
@@ -8,6 +9,7 @@ namespace DotaMod
     {
         public Invoker() : base( 80, 10, 8, 10, 20,11 ,400)
         {
+            Perks = new[] {new DeathBreath()};
         }
     }
 }

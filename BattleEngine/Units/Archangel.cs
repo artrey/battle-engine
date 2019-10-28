@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.ComponentModel;
 using BattleEngine.Casts;
 
@@ -9,7 +8,10 @@ namespace BattleEngine.Units
   {
     public Archangel() : base(220, 35, 35, 50, 50, 12.6, 1300)
     {
-      Casts = new List<Cast> {new RaiseDead()};
+      Casts = new []
+      {
+        new RaiseDead()
+      };
     }
   }
 }

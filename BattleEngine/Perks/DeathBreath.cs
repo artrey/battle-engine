@@ -1,13 +1,12 @@
 using BattleEngine.BattleEntities;
-using BattleEngine.Modifiers;
 
 namespace BattleEngine.Perks
 {
-    public class UnlimitedRetalitation : Perk
+    public class DeathBreath : Perk
     {
         public override void Process(UnitsStack stack)
         {
-            stack.AddPermanentModifier(new UnlimitedRetaliation());
+            stack.AddPermanentModifier(new Modifiers.DeathBreath());
         }
     }
 }

@@ -27,6 +27,9 @@ namespace BattleEngine.Actions
             }
 
             var damage = (uint) (current.Count * mult * Utils.GetURandom(current.MinDamage, current.MaxDamage));
+            
+            damage = current.Modifiers.Aggregate(damage, 
+                (dmg, modifier) => modifier.FixDamage(current, enemy, dmg));
       
             enemy.Damage(damage);
         }

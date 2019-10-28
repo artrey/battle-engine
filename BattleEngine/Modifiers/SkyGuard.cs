@@ -12,8 +12,11 @@ namespace BattleEngine.Modifiers
             DefenceHitPoints = defenceHitPoints;
         }
 
-        public override void Apply(UnitsStack self)
+        public override uint FixDamage(UnitsStack attacker, UnitsStack defender, uint damage)
         {
+            var absorption = Math.Min(DefenceHitPoints, damage / 2);
+            DefenceHitPoints -= absorption;
+            return damage - absorption;
         }
     }
 }

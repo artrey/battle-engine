@@ -6,7 +6,7 @@ namespace BattleEngine.Perks
     {
         public override void Process(UnitsStack stack)
         {
-            throw new System.NotImplementedException();
+            
         }
     }
 }
