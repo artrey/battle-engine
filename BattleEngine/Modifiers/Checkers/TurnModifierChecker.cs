@@ -10,9 +10,6 @@ namespace BattleEngine.Modifiers.Checkers
 
         public bool Expired => Turns == 0;
         public void Process() => Turns -= 1;
-        public IModifierChecker Clone()
-        {
-            return new TurnModifierChecker(Turns);
-        }
+        public IModifierChecker Clone() => new TurnModifierChecker(Turns);
     }
 }

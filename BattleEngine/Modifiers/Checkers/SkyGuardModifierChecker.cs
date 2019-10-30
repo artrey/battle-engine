@@ -6,10 +6,8 @@ namespace BattleEngine.Modifiers.Checkers
         {
         }
 
-        public override bool Expired => _modifier.DefenceHitPoints == 0;
+        public override bool Expired => Modifier.DefenceHitPoints == 0;
         public override IModifierChecker Clone()
-        {
-            return new SkyGuardModifierChecker(_modifier);
-        }
+            => new SkyGuardModifierChecker(Modifier);
     }
 }

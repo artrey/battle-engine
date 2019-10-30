@@ -2,13 +2,10 @@ using BattleEngine.BattleEntities;
 
 namespace BattleEngine.Modifiers
 {
-    public class UnlimitedRetaliation : AllowModifier
+    public class UnlimitedRetaliation : IModifier
     {
-        private const string Key = "CanRetaliate";
-
-        public override void Apply(UnitsStack self)
-        {
-            self.Properties[Key] = true;
-        }
+        public int Priority => 1000;
+        public void Apply(UnitsStack self) => self.SetAbility("retaliate", true);
+        public uint FixDamage(UnitsStack attacker, UnitsStack defender, uint damage) => damage;
     }
 }

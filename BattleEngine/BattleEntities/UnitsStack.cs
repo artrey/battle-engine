@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace BattleEngine.BattleEntities
 {
-  public class UnitsStack : IParametersEntity, ICapacity
+  public class UnitsStack : IParametersEntity, ICapacity, IModifiable
   {
     public Unit Unit { get; }
     public uint InitialCount { get; }
@@ -37,6 +37,13 @@ namespace BattleEngine.BattleEntities
     
     public uint Capacity => Constants.STACK_MAX_CAPACITY;
     public uint Count { get; private set; }
+
+    private readonly Dictionary<string, bool> _abilities = new Dictionary<string, bool>();
+    public bool TryGetAbility(string type, out bool value) 
+      => _abilities.TryGetValue(type, out value);
+    public bool GetAbility(string type, bool defaultValue) 
+      => TryGetAbility(type, out var value) ? value : defaultValue;
+    public void SetAbility(string type, bool value) => _abilities[type] = value;
 
     private readonly HashSet<IModifier> _permanentModifiers;
     private readonly Dictionary<IModifier, IModifierChecker> _temporaryModifiers;

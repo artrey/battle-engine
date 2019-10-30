@@ -4,13 +4,13 @@ namespace BattleEngine.Modifiers.Checkers
 {
     public abstract class LinkedModifierChecker<T> : IModifierChecker where T : IModifier
     {
-        protected T _modifier;
+        protected readonly T Modifier;
         
         protected LinkedModifierChecker(IModifier modifier)
         {
             if (modifier is T validModifier)
             {
-                _modifier = validModifier;
+                Modifier = validModifier;
             }
             else
             {

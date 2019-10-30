@@ -4,6 +4,7 @@ namespace BattleEngine.Modifiers
 {
     public abstract class AllowModifier : EqualityClass, IModifier
     {
+        public abstract int Priority { get; }
         public virtual bool CanAct() => true;
         public virtual bool CanWait() => true;
         public virtual bool CanAttack(UnitsStack enemy) => true;
