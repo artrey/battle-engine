@@ -8,7 +8,7 @@ namespace BattleEngine
   {
     private class UnitsStackComparer : IComparer<UnitsStack>
     {
-      int IComparer<UnitsStack>.Compare(UnitsStack x, UnitsStack y)
+      public int Compare(UnitsStack x, UnitsStack y)
       {
         if (x == null && y == null) return 0;
         if (x == null) return -1;
