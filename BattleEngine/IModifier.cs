@@ -21,6 +21,6 @@ namespace BattleEngine
 
         void Apply(UnitsStack self);
         
-        uint FixDamage(UnitsStack attacker, UnitsStack defender, uint damage);
+//        uint FixDamage(UnitsStack attacker, UnitsStack defender, uint damage);
     }
 }

@@ -8,7 +8,8 @@ namespace BattleEngine
 {
     public static class Loader
     {
-        private static readonly DirectoryInfo AssemblyDirectory = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory;
+        private static readonly DirectoryInfo AssemblyDirectory 
+            = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory;
         
         public static IEnumerable<T> GetEnumerableOfType<T>(IEnumerable<Assembly> assemblies, 
             params object[] constructorArgs) where T : class

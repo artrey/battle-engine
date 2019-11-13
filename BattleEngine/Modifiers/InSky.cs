@@ -3,7 +3,7 @@ using BattleEngine.BattleEntities;
 
 namespace BattleEngine.Modifiers
 {
-    public class InSky : AllowModifier
+    public class InSky : BaseModifier
     {
         public const double AttackMultiplier = 0.3;
         
@@ -14,7 +14,9 @@ namespace BattleEngine.Modifiers
         public override bool CanRetaliate(UnitsStack enemy) => false;
         public override bool CanGotRetaliate(UnitsStack enemy) => false;
 
-        public override void Apply(UnitsStack self) 
-            => self.UpdateAttack((uint) Math.Round(self.Attack * AttackMultiplier));
+        public override void Apply(UnitsStack self)
+        {
+            self.UpdateAttack((uint) Math.Round(self.Attack * AttackMultiplier));
+        }
     }
 }

@@ -1,10 +1,11 @@
 using BattleEngine.BattleEntities;
 
-namespace BattleEngine.Modifiers
+namespace BattleEngine
 {
-    public abstract class AllowModifier : EqualityClass, IModifier
+    public abstract class BaseModifier : EqualityClass, IModifier
     {
-        public abstract int Priority { get; }
+        public virtual int Priority => 0;
+
         public virtual bool CanAct() => true;
         public virtual bool CanWait() => true;
         public virtual bool CanAttack(UnitsStack enemy) => true;
@@ -13,7 +14,8 @@ namespace BattleEngine.Modifiers
         public virtual bool CanBeCasted(Cast cast) => true;
         public virtual bool CanRetaliate(UnitsStack enemy) => true;
         public virtual bool CanGotRetaliate(UnitsStack enemy) => true;
-        public virtual void Apply(UnitsStack self) {}
+        
+        public abstract void Apply(UnitsStack self);
         public virtual uint FixDamage(UnitsStack attacker, UnitsStack defender, uint damage) => damage;
     }
 }

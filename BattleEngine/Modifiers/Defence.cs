@@ -3,11 +3,11 @@ using BattleEngine.BattleEntities;
 
 namespace BattleEngine.Modifiers
 {
-    public class Defence : AllowModifier
+    public class Defence : BaseModifier
     {
         public const double DefenceMultiplier = 0.3;
-        
+
         public override void Apply(UnitsStack self) 
-            => self.UpdateDefence((uint) Math.Round(self.Defence * DefenceMultiplier));
+            =>self.UpdateDefence((uint) Math.Round(self.Defence * DefenceMultiplier));
     }
 }

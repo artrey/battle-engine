@@ -3,11 +3,14 @@ using BattleEngine.BattleEntities;
 
 namespace BattleEngine.Modifiers
 {
-    public class DeathBreath : AllowModifier
+    public class DeathBreath : BaseModifier
     {
-        public override uint FixDamage(UnitsStack attacker, UnitsStack defender, uint damage)
+        public override int Priority => 500;
+
+        public override void Apply(UnitsStack self)
         {
-            return Math.Max(defender.LastUnitHitPoints, damage);
+            self.DamageHandlers.Add((attacker, defender, damage) =>
+                Math.Max(defender.LastUnitHitPoints, damage));
         }
     }
 }

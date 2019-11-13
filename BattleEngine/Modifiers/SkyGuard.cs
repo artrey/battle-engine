@@ -3,7 +3,7 @@ using BattleEngine.BattleEntities;
 
 namespace BattleEngine.Modifiers
 {
-    public class SkyGuard : AllowModifier
+    public class SkyGuard : BaseModifier
     {
         public uint DefenceHitPoints { get; private set; }
         

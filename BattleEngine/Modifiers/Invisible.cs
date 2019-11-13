@@ -2,7 +2,7 @@ using BattleEngine.BattleEntities;
 
 namespace BattleEngine.Modifiers
 {
-    public class Invisible : AllowModifier
+    public class Invisible : BaseModifier
     {
         public override bool CanBeAttacked(UnitsStack enemy) => false;
 

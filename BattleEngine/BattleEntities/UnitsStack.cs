@@ -45,6 +45,9 @@ namespace BattleEngine.BattleEntities
       => TryGetAbility(type, out var value) ? value : defaultValue;
     public void SetAbility(string type, bool value) => _abilities[type] = value;
 
+    public readonly List<Func<UnitsStack, UnitsStack, uint, uint>> DamageHandlers 
+      = new List<Func<UnitsStack, UnitsStack, uint, uint>>();
+
     private readonly HashSet<IModifier> _permanentModifiers;
     private readonly Dictionary<IModifier, IModifierChecker> _temporaryModifiers;
 
